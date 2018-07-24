@@ -8,8 +8,6 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern {
-//    #[wasm_bindgen(js_namespace = console)]
-//    fn log(s: &str);
     fn throw(s: &str);
 }
 
@@ -87,7 +85,6 @@ impl SkipList {
     SkipList { length: 0, list: IndexedList::new() }
   }
 
-
   #[wasm_bindgen(js_name = indexOf)]
   pub fn index_of(&self, key: String) -> isize {
     match self.list.index_of(&key) {
@@ -97,7 +94,6 @@ impl SkipList {
   }
 
   #[wasm_bindgen(js_name = _insertAfter)]
-
   pub fn insert_after(&mut self, after: Option<String>, key: String, val: String) {
     match after {
       Some(s) => self.list.insert_after(&s,key,val),
