@@ -8,14 +8,11 @@ extern crate cfg_if;
 extern crate uuid;
 extern crate time;
 
-use std::mem;
+use std::boxed::Box;
 use std::vec::Vec;
-//use std::collections::LinkedList;
-//use std::collections::HashSet;
-//use wbg_rand::{Rng, wasm_rng};
+use std::collections::HashSet;
 use uuid::Uuid;
 
-/*
 struct BranchNode<K,V> {
   leftKeys: HashSet<K>,
   left: Box<TreeNode<K,V>>,
@@ -32,59 +29,149 @@ enum TreeNode<K,V> {
   Branch(BranchNode<K,V>),
   Leaf(LeafNode<K,V>),
 }
-*/
 
-//#[derive(Clone)]
-struct IndexedList<K,V> {
-  v: Vec<(K,V)>
-}
+trait IndexedList<K: PartialEq + Clone,V: Clone> {
+  fn index_of(&self, key: &K) -> Option<usize>;
+  fn insert(&mut self, index: usize, key: K, val: V);
+  fn remove(&mut self, index: usize) -> bool;
+  fn get_key(&self, index: usize) -> Option<&K>;
+  fn get_value(&self, index: usize) -> Option<&V>;
+  fn set(&mut self, key: K, val: V) -> Option<()>;
 
-impl<K: Clone + PartialEq ,V: Clone> IndexedList<K,V> {
-  pub fn new() -> IndexedList<K,V> {
-    IndexedList {
-      v: vec![]
-    }
-  }
-
-  pub fn index_of(&self, key: &K) -> Option<usize> {
-    self.v.iter().position(|&(ref k,ref _v)| k == key )
-  }
-
-  pub fn insert(&mut self, index: usize, key: K, val: V) {
-    self.v.insert(index, (key,val))
-  }
-
-  pub fn insert_after(&mut self, node: &K, key: K, val: V) {
+  fn insert_after(&mut self, node: &K, key: K, val: V) {
     match self.index_of(&node) {
       Some(i) => self.insert(i+1, key, val),
       None => self.insert(0, key, val)
     }
   }
 
-  pub fn remove(&mut self, index: usize) -> (K,V) {
-    self.v.remove(index)
+  fn get(&self, key: K) -> Option<V> {
+    match self.index_of(&key) {
+      Some(index) =>
+        match self.get_value(index) {
+          Some(v) => Some(v.clone()),
+          None => None
+        },
+      None => None
+    }
+  }
+}
+
+impl<K: Clone + PartialEq,V: Clone> IndexedList<K,V> for BranchNode<K,V> {
+  fn index_of(&self, key: &K) -> Option<usize> { None }
+  fn insert(&mut self, index: usize, key: K, val: V) {}
+  fn remove(&mut self, index: usize) -> bool { false }
+  fn get_key(&self, index: usize) -> Option<&K> { None }
+  fn get_value(&self, index: usize) -> Option<&V> { None }
+  fn set(&mut self, key: K, val: V) -> Option<()> { None }
+  fn get(&self, key: K) -> Option<V> { None }
+}
+
+impl<K: Clone + PartialEq,V: Clone> IndexedList<K,V> for LeafNode<K,V> {
+  fn index_of(&self, key: &K) -> Option<usize> { None }
+  fn insert(&mut self, index: usize, key: K, val: V) {} 
+  fn remove(&mut self, index: usize) -> bool { false }
+  fn get_key(&self, index: usize) -> Option<&K> { None }
+  fn get_value(&self, index: usize) -> Option<&V> { None }
+  fn set(&mut self, key: K, val: V) -> Option<()> { None }
+  fn get(&self, key: K) -> Option<V> { None }
+}
+
+impl<K: Clone + PartialEq,V: Clone> TreeNode<K,V> {
+  pub fn new() -> TreeNode<K,V> {
+    TreeNode::Leaf(LeafNode { keys: vec![], vals: vec![] })
+  }
+}
+
+impl<K: Clone + PartialEq,V: Clone> IndexedList<K,V> for TreeNode<K,V> {
+
+  fn index_of(&self, key: &K) -> Option<usize> {
+    match self {
+      TreeNode::Branch(branch) => branch.index_of(key),
+      TreeNode::Leaf(leaf) => leaf.index_of(key),
+    }
   }
 
-  pub fn get_entry(&self, index: usize) -> Option<&(K,V)> {
-    self.v.get(index)
-//    let mut iter = self.v.iter();
-//    iter.nth(index)
+  fn insert(&mut self, index: usize, key: K, val: V) {
+    match self {
+      TreeNode::Branch(branch) => branch.insert(index,key,val),
+      TreeNode::Leaf(leaf) => leaf.insert(index,key,val),
+    }
   }
 
-  pub fn set(&mut self, key: K, val: V) -> Option<()> {
-    match self.v.iter_mut().find(|&(ref k,ref _v)| *k == key) {
-      Some(o) => { *o = (key,val); Some(()) },
+  fn remove(&mut self, index: usize) -> bool {
+    match self {
+      TreeNode::Branch(branch) => branch.remove(index),
+      TreeNode::Leaf(leaf) => leaf.remove(index),
+    }
+  }
+
+  fn get_key(&self, index: usize) -> Option<&K> {
+    match self {
+      TreeNode::Branch(branch) => branch.get_key(index),
+      TreeNode::Leaf(leaf) => leaf.get_key(index),
+    }
+  }
+
+  fn get_value(&self, index: usize) -> Option<&V> {
+    match self {
+      TreeNode::Branch(branch) => branch.get_value(index),
+      TreeNode::Leaf(leaf) => leaf.get_value(index),
+    }
+  }
+
+  fn set(&mut self, key: K, val: V) -> Option<()> {
+    match self {
+      TreeNode::Branch(branch) => branch.set(key,val),
+      TreeNode::Leaf(leaf) => leaf.set(key,val),
+    }
+  }
+}
+
+//#[derive(Clone)]
+struct IndexedVector<K,V> {
+  v: Vec<(K,V)>,
+}
+
+impl<K,V> IndexedVector<K,V> {
+  fn new() -> IndexedVector<K,V> {
+    IndexedVector {
+      v: vec![]
+    }
+  }
+}
+
+impl<K: PartialEq + Clone,V: Clone> IndexedList<K,V> for IndexedVector<K,V> {
+
+  fn index_of(&self, key: &K) -> Option<usize> {
+    self.v.iter().position(|&(ref k,ref _v)| k == key )
+  }
+
+  fn insert(&mut self, index: usize, key: K, val: V) {
+    self.v.insert(index, (key,val))
+  }
+
+  fn remove(&mut self, index: usize) -> bool {
+    self.v.remove(index); // fixme - this panics instead of returning false
+    true
+  }
+
+  fn get_key(&self, index: usize) -> Option<&K> {
+    match self.v.get(index) {
+      Some(&(ref k,ref v)) => Some(k),
+      None => None
+    }
+  }
+  fn get_value(&self, index: usize) -> Option<&V> {
+    match self.v.get(index) {
+      Some(&(ref k,ref v)) => Some(v),
       None => None
     }
   }
 
-  pub fn get_value(&self, key: K) -> Option<V> {
-    match self.index_of(&key) {
-      Some(index) =>
-        match self.get_entry(index) {
-          Some((_k,v)) => Some(v.clone()),
-          None => None
-        },
+  fn set(&mut self, key: K, val: V) -> Option<()> {
+    match self.v.iter_mut().find(|&(ref k,ref _v)| *k == key) {
+      Some(o) => { *o = (key,val); Some(()) },
       None => None
     }
   }
@@ -112,7 +199,7 @@ cfg_if! {
         pub struct SkipList {
             #[wasm_bindgen(readonly)]
             pub length: usize,
-            list: IndexedList<String,String>,
+            list: IndexedVector<String,String>,
         }
 
         #[wasm_bindgen]
@@ -120,7 +207,7 @@ cfg_if! {
 
           #[wasm_bindgen(constructor)]
           pub fn new() -> SkipList {
-            SkipList { length: 0, list: IndexedList::new() }
+            SkipList { length: 0, list: IndexedVector::new() }
           }
 
           #[wasm_bindgen(js_name = indexOf)]
@@ -150,12 +237,12 @@ cfg_if! {
 
           #[wasm_bindgen(js_name = _keyOf)]
           pub fn key_of(&self, index: isize) -> Option<String> {
-            self.list.get_entry(self.clean_index(index)).and_then(|(k,_v)| Some(k.clone()))
+            self.list.get_key(self.clean_index(index)).and_then(|k| Some(k.clone()))
           }
 
           #[wasm_bindgen(js_name = _valueOf)]
           pub fn value_of(&self, index: isize) -> Option<String> {
-            self.list.get_entry(self.clean_index(index)).and_then(|(_k,v)| Some(v.clone()))
+            self.list.get_value(self.clean_index(index)).and_then(|v| Some(v.clone()))
           }
 
           fn clean_index(&self, index: isize) -> usize {
@@ -172,7 +259,7 @@ cfg_if! {
 
           #[wasm_bindgen(js_name = getValue)]
           pub fn get_value(&self, key: String) -> Option<String> {
-            self.list.get_value(key).clone()
+            self.list.get(key).clone()
           }
 
           #[wasm_bindgen(js_name = _setValue)]
@@ -255,7 +342,7 @@ fn choose<'a, T>(values: &'a [T]) -> Option<&'a T> {
   }
 }
 
-fn fill(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
+fn fill(size: usize, s: &mut Box<IndexedList<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
   for _ in 0..size {
     let key = uuid();
     let val = uuid();
@@ -267,7 +354,7 @@ fn fill(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
   }
 }
 
-fn indexof(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
+fn indexof(size: usize, s: &mut Box<IndexedList<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
   for _ in 0..size {
     match choose(keys) {
       Some(index) => s.index_of(&index),
@@ -276,17 +363,17 @@ fn indexof(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
   };
 }
 
-fn keyof(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
+fn keyof(size: usize, s: &mut Box<IndexedList<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
   for _ in 0..size {
     let index = (random() * keys.len() as f64).floor() as usize;
-    s.get_entry(index);
+    s.get_value(index);
   };
 }
 
 
 pub fn bench_local(size: usize) {
   let mut keys = vec![];
-  let mut s = IndexedList::new();
+  let mut s : Box<IndexedList<Uuid,Uuid>> = Box::new(IndexedVector::new());
   measure("fill-native",|| fill(size, &mut s,&mut keys));
   measure("indexof-native",|| indexof(size, &mut s,&mut keys));
   measure("keyOf-native",|| keyof(size, &mut s,&mut keys));

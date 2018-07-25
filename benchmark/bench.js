@@ -63,12 +63,6 @@ function removeIndex(s) {
   return s
 }
 
-function iter(s) {
-  for (let i = 0; i < 100; i++) {
-    let x= [...s.list]
-  }
-}
-
 function fill(SkipList) {
   let s = new SkipList()
   let keys = []
@@ -83,18 +77,19 @@ function fill(SkipList) {
 }
 
 skip_async.then((skip) => {
+
   let s1 = bench("fill-ref", () => fill(skip_ref.SkipList))
-  let s2 = bench("fill-rust", () => fill(skip.SkipList))
-  skip.bench(SIZE)
   bench("indexOf-ref", () => indexOf(s1))
-  bench("indexOf-rust", () => indexOf(s2))
   bench("keyOf-ref", () => keyOf(s1))
+  console.log("------")
+  let s2 = bench("fill-rust", () => fill(skip.SkipList))
+  bench("indexOf-rust", () => indexOf(s2))
   bench("keyOf-rust", () => keyOf(s2))
+  console.log("------")
+  skip.bench(SIZE)
 /*
   bench("getValue-ref", () => getValue(s1))
   bench("getValue-rust", () => getValue(s2))
-  bench("iter-ref", () => iter(s1))
-  bench("iter-rust", () => iter(s2))
   s1 = bench("setValue-ref", () => setValue(s1))
   s2 = bench("setValue-rust", () => setValue(s2))
   s1 = bench("removeIndex-ref", () => removeIndex(s1))
