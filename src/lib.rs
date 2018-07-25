@@ -1,25 +1,57 @@
 
 #![feature(use_extern_macros, wasm_custom_section, wasm_import_module)]
+#![feature(linked_list_extras)] 
 
+extern crate uuid;
+extern crate time;
 extern crate wasm_bindgen;
 
-use std::vec::Vec;
+
+//use std::vec::Vec;
+//use std::collections::LinkedList;
+//use std::collections::HashSet;
+//use wbg_rand::{Rng, wasm_rng};
 use wasm_bindgen::prelude::*;
+use uuid::Uuid;
 
 #[wasm_bindgen]
 extern {
+    #[wasm_bindgen(js_namespace = Math)]
+    fn random() -> f64;
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
     fn throw(s: &str);
+    fn now() -> f64;
 }
 
 #[wasm_bindgen]
-#[derive(Clone)]
+//#[derive(Clone)]
 pub struct SkipList {
     #[wasm_bindgen(readonly)]
     pub length: usize,
     list: IndexedList<String,String>,
 }
 
-#[derive(Clone)]
+/*
+struct BranchNode<K,V> {
+  leftKeys: HashSet<K>,
+  left: Box<TreeNode<K,V>>,
+  rightKeys: HashSet<K>,
+  right: Box<TreeNode<K,V>>,
+}
+
+struct LeafNode<K,V> {
+  keys: Vec<K>,
+  vals: Vec<V>,
+}
+
+enum TreeNode<K,V> {
+  Branch(BranchNode<K,V>),
+  Leaf(LeafNode<K,V>),
+}
+*/
+
+//#[derive(Clone)]
 struct IndexedList<K,V> {
   v: Vec<(K,V)>
 }
@@ -41,8 +73,8 @@ impl<K: Clone + PartialEq ,V: Clone> IndexedList<K,V> {
 
   pub fn insert_after(&mut self, node: &K, key: K, val: V) {
     match self.index_of(&node) {
-      Some(i) => self.v.insert(i+1, (key,val)),
-      None => self.v.insert(0, (key,val))
+      Some(i) => self.insert(i+1, key, val),
+      None => self.insert(0, key, val)
     }
   }
 
@@ -51,16 +83,13 @@ impl<K: Clone + PartialEq ,V: Clone> IndexedList<K,V> {
   }
 
   pub fn get_entry(&self, index: usize) -> Option<&(K,V)> {
-    self.v.get(index)
+    let mut iter = self.v.iter();
+    iter.nth(index)
   }
 
-  // FIXME - messy!!
   pub fn set(&mut self, key: K, val: V) -> Option<()> {
-    match self.index_of(&key) {
-      Some(i) => match self.v.get_mut(i) {
-                  Some(v) => { *v = (key.clone(),val.clone()); Some(()) },
-                  None => None
-                },
+    match self.v.iter_mut().find(|&(ref k,ref _v)| *k == key) {
+      Some(o) => { *o = (key,val); Some(()) },
       None => None
     }
   }
@@ -68,7 +97,7 @@ impl<K: Clone + PartialEq ,V: Clone> IndexedList<K,V> {
   pub fn get_value(&self, key: K) -> Option<V> {
     match self.index_of(&key) {
       Some(index) =>
-        match self.v.get(index) {
+        match self.get_entry(index) {
           Some((_k,v)) => Some(v.clone()),
           None => None
         },
@@ -162,17 +191,56 @@ impl SkipList {
   }
 }
 
-/*
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    log(&format!("Hello, {}!", name));
+//fn pick(v: Vec<Uuid>) -> Option<&Uuid> { }
+
+fn measure<F: FnMut()>(label: &str, mut f: F) {
+  let start = now();
+  f();
+  let end = now();
+  log(&format!("{} :: {}", label, end - start));
 }
-*/
+
+fn uuid() -> Uuid {
+  let mut bytes = [0; 16];
+  for i in 0..16 {
+    bytes[i] = random() as u8;
+  }
+//  rng.fill_bytes(&mut bytes);
+  Uuid::from_random_bytes(bytes)
+}
+
+fn choose<'a, T>(values: &'a [T]) -> Option<&'a T> {
+  if values.len() == 0 {
+    None
+  } else {
+    let i = (random() * (values.len() as f64)).floor() as usize;
+    Some(&values[i])
+  }
+}
+
+fn fill(size: usize, s: &mut IndexedList<Uuid,Uuid>, keys: &mut Vec<Uuid>) {
+  for _ in 0..size {
+    let key = uuid();
+    let val = uuid();
+    match choose(keys) {
+      Some(index) => s.insert_after(index,key,val),
+      None => s.insert(0,key,val)
+    }
+    keys.push(key.clone());
+  }
+}
+
+#[wasm_bindgen]
+pub fn bench(size: usize) {
+  let mut keys = vec![];
+  let mut s = IndexedList::new();
+  measure("fill-native",|| fill(size, &mut s,&mut keys));
+}
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn bench_test() {
+      ::bench();
     }
 }

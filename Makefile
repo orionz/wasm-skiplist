@@ -1,4 +1,4 @@
-./dist/index.js: src/lib.rs ./index.js
+./dist/index.js: src/lib.rs ./index.js Cargo.toml
 	npm run build-debug && webpack
 
 test: ./dist/index.js

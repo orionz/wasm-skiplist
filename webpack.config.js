@@ -1,4 +1,5 @@
 const path = require("path");
+const microtime = require("microtime");
 
 module.exports = {
   entry: "./index.js",

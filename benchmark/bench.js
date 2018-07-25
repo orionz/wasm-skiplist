@@ -3,7 +3,7 @@ var microtime = require("microtime");
 
 const uuidv4 = require('uuid/v4');
 
-const SIZE = 1000;
+const SIZE = 10000;
 
 let skip_ref = require("./skip_list_ref");
 let skip_async = require("../dist/index");
@@ -85,6 +85,8 @@ function fill(SkipList) {
 skip_async.then((skip) => {
   let s1 = bench("fill-ref", () => fill(skip_ref.SkipList))
   let s2 = bench("fill-rust", () => fill(skip.SkipList))
+  skip.bench(SIZE)
+/*
   bench("indexOf-ref", () => indexOf(s1))
   bench("indexOf-rust", () => indexOf(s2))
   bench("keyOf-ref", () => keyOf(s1))
@@ -97,5 +99,6 @@ skip_async.then((skip) => {
   s2 = bench("setValue-rust", () => setValue(s2))
   s1 = bench("removeIndex-ref", () => removeIndex(s1))
   s2 = bench("removeIndex-rust", () => removeIndex(s2))
+*/
 })
 

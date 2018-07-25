@@ -1,6 +1,8 @@
 
 const sk1 = import("./skip_list");
 
+global.now = () => (Date.now() / 1000)
+
 let iterator = function(mode) {
   let index = 0;
   let key = () => this.keyOf(index)
