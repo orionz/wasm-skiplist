@@ -25,28 +25,28 @@ function bench(key,f) {
 }
 
 function indexOf(s) {
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < SIZE; i++) {
     let key = pick(s.keys)
     s.list.indexOf(key)
   }
 }
 
 function keyOf(s) {
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < SIZE; i++) {
     let i = index(s.keys);
     s.list.keyOf(i);
   }
 }
 
 function getValue(s) {
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < SIZE; i++) {
     let key = pick(s.keys)
     s.list.getValue(key);
   }
 }
 
 function setValue(s) {
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < SIZE; i++) {
     let key = pick(s.keys);
     let val = uuidv4();
     s.list = s.list.setValue(key,val);
@@ -86,11 +86,11 @@ skip_async.then((skip) => {
   let s1 = bench("fill-ref", () => fill(skip_ref.SkipList))
   let s2 = bench("fill-rust", () => fill(skip.SkipList))
   skip.bench(SIZE)
-/*
   bench("indexOf-ref", () => indexOf(s1))
   bench("indexOf-rust", () => indexOf(s2))
   bench("keyOf-ref", () => keyOf(s1))
   bench("keyOf-rust", () => keyOf(s2))
+/*
   bench("getValue-ref", () => getValue(s1))
   bench("getValue-rust", () => getValue(s2))
   bench("iter-ref", () => iter(s1))
