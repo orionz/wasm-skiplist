@@ -2,8 +2,6 @@
 #![feature(use_extern_macros, wasm_custom_section, wasm_import_module)]
 #![feature(linked_list_extras)] 
 
-//#![allow(dead_code)]
-
 #[macro_use]
 extern crate cfg_if;
 
@@ -20,9 +18,6 @@ use std::vec::Vec;
 use std::collections::HashSet;
 use std::iter::FromIterator;
 use uuid::Uuid;
-//use std::iter::FromIterator;
-//use std::mem;
-//use std::ops::Deref;
 
 #[derive(Clone)]
 enum Node<K,V> {
@@ -151,17 +146,12 @@ impl<K: Debug + Eq + PartialEq + Clone + Hash, V: Clone> ListMap<K,V> for Node<K
 
 impl<K: Debug + Eq + PartialEq + Clone + Hash,V: Clone> Branch<K,V> {
   pub fn new(left: Leaf<K,V>, right: Leaf<K,V>) -> Branch<K,V> {
-//    left.keys.iter().for_each(|k| log(&format!("LEFT KEY {:?}", k)));
-//    log(&format!("INPUT {} {}", left.keys.len(), right.keys.len()));
-    let x = Branch {
+    Branch {
       left_keys: HashSet::from_iter(left.keys.iter().cloned()),
       right_keys: HashSet::from_iter(right.keys.iter().cloned()),
       left: Box::new(Node::Leaf(left)),
       right: Box::new(Node::Leaf(right))
-    };
-//    log(&format!("OUTPUT ++ {:?}", x.left_keys));
-//    log(&format!("OUTPUT {} {}", x.left_keys.len(), x.right_keys.len()));
-    x
+    }
   }
 }
 
@@ -312,7 +302,6 @@ impl<K: Debug + Clone + Eq + Hash + PartialEq,V: Clone> ListMap<K,V> for Leaf<K,
   }
 
   fn insert(&mut self, index: usize, key: K, val: V) {
-//    log(&format!("LEAF INSERT {:?}",index));
     self.keys.insert(index, key);
     self.vals.insert(index, val);
   }
@@ -339,7 +328,6 @@ impl<K: Debug + Clone + Eq + Hash + PartialEq,V: Clone> ListMap<K,V> for Leaf<K,
   }
 }
 
-//#[derive(Clone)]
 struct IndexedVector<K,V> {
   v: Vec<(K,V)>,
 }
@@ -413,7 +401,6 @@ cfg_if! {
         }
 
         #[wasm_bindgen]
-        //#[derive(Clone)]
         pub struct SkipList {
             #[wasm_bindgen(readonly)]
             pub length: usize,
@@ -537,32 +524,17 @@ fn measure<F: FnMut()>(label: &str, mut f: F) {
 
 fn uuid() -> Uuid {
   let mut bytes : [u8; 16]= [0; 16];
-/*
-  unsafe {
-    let a = mem::transmute::<f64, [u8; 8]>(random());
-    let b = mem::transmute::<f64, [u8; 8]>(random());
-    for i in 0..8 {
-      bytes[i] = a[i];
-      bytes[i+8] = b[i];
-    }
-  }
-*/
   for i in 0..16 {
-    //let r = random();
-    //log(&format!("{:?} {:?}", r, r as u8));
     bytes[i] = (random() * 256.0) as u8;
   }
-  //log(&format!("{:?}", bytes));
   Uuid::from_random_bytes(bytes)
 }
 
 fn choose<'a, T>(values: &'a [T]) -> Option<&'a T> {
   if values.len() == 0 {
-//    log(&format!("NONE"));
     None
   } else {
     let i = (random() * (values.len() as f64)).floor() as usize;
-//    log(&format!("CHOOSE {:?}",i));
     Some(&values[i])
   }
 }
