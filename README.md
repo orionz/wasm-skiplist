@@ -17,12 +17,14 @@ in wasm?
 
 ### api issues
 1. wasm import is async
-2. js does not have destructors / cant use immutable patterns
+2. js does not have destructors / cant use immutable patterns and rely on the GC
 
-### developer issues
+### development issues
 1. some basic services not there (rand,stdout,systime)
-3. rust is not high velocity
+2. rust is not high velocity
 
 ### happy things
-1. rust-wasm is really easy to implement
-2. rust is super fun
+1. rust is super fun
+2. rust-wasm is really easy to implement
+3. getting rust+wasm to pass the existing skip-list tests was pretty simple
+
