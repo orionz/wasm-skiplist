@@ -9,7 +9,7 @@ use std::iter::FromIterator;
 
 use ::{ListMap,log};
 
-static mut NODE_SIZE : usize = 90;
+const NODE_SIZE : usize = 90;
 
 #[derive(Clone)]
 enum Node<K,V> {
@@ -160,9 +160,7 @@ impl<K: Debug + Eq + PartialEq + Clone + Hash,V: Clone> Leaf<K,V> {
   }
 
   fn full(&self) -> bool {
-    unsafe {
     self.keys.len() >= NODE_SIZE
-    }
   }
 
   fn pop(&mut self) -> Leaf<K,V> {

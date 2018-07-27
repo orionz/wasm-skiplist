@@ -155,10 +155,6 @@ pub fn bench_vec_impl(size: usize) {
 }
 
 pub fn bench_tree_impl(size: usize) {
-
-//  for i in vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ] {
-//    unsafe { NODE_SIZE = i; }
-//    log(&format!("i={:?}",i));
     let mut keys2 = vec![];
     let mut s2 : Box<ListMap<Uuid,Uuid>> = Box::new(TreeMap::new());
     measure("fill-native-tree",|| fill(size, &mut s2,&mut keys2));
@@ -167,7 +163,6 @@ pub fn bench_tree_impl(size: usize) {
     measure("getValue-native-tree",|| getvalue(size, &mut s2,&mut keys2));
     measure("setValue-native-tree",|| setvalue(size, &mut s2,&mut keys2));
     measure("remove-native-tree",|| remove(size, &mut s2,&mut keys2));
-//  }
 }
 
 #[cfg(test)]
