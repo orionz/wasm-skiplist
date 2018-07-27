@@ -31,6 +31,5 @@ in wasm?
 ## Todo
 
 1. implement same algorithm as skiplist to compare apples to apples
-2. try a neon/ffi spike
-3. break out code into different files or projects
+2. try a neon spike
 
