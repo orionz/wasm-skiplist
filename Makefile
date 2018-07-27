@@ -1,8 +1,8 @@
-./dist/index.js: src/lib.rs ./index.js Cargo.toml src/wasm.rs src/native.rs
+./dist/index.js: src/lib.rs ./index.js Cargo.toml src/wasm.rs src/native.rs src/tree.rs src/vec.rs
 	npm run build-debug && webpack
 
 native:
-	Cargo test -- --nocapture
+	Cargo test -q -- --nocapture
 
 test: ./dist/index.js
 	mocha

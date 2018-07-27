@@ -97,7 +97,7 @@ skip_async.then((skip) => {
   //console.log("------ [ wasm - vec ] ---------")
   //skip.bench_vector(SIZE)
   console.log("------ [ binary - tree ] -------")
-  require('child_process').exec("Cargo test -- --nocapture",(err,stdout,stderr) => {
+  require('child_process').exec("Cargo test -q -- --nocapture",(err,stdout,stderr) => {
     console.log(stdout)
   })
 })
