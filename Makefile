@@ -1,7 +1,7 @@
 ./dist/index.js: src/lib.rs ./index.js Cargo.toml
 	npm run build-debug && webpack
 
-native: ./dist/index.js
+native:
 	Cargo test -- --nocapture
 
 test: ./dist/index.js
