@@ -9,7 +9,6 @@ extern crate uuid;
 extern crate time;
 extern crate rand;
 
-use rand::Rng;
 use std::fmt::Debug;
 use std::cmp::Eq;
 use std::hash::Hash;
@@ -594,10 +593,10 @@ fn remove(size: usize, s: &mut Box<ListMap<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
 
 
 pub fn bench_local(size: usize) {
-/*
-  let mut keys1 = vec![];
-  let mut s1 : Box<ListMap<Uuid,Uuid>> = Box::new(IndexedVector::new());
+//  let mut keys1 = vec![];
+  let mut _s1 : Box<ListMap<Uuid,Uuid>> = Box::new(IndexedVector::new());
 
+/*
   measure("fill-native-vec",|| fill(size, &mut s1,&mut keys1));
   measure("indexof-native-vec",|| indexof(size, &mut s1,&mut keys1));
   measure("keyOf-native-vec",|| keyof(size, &mut s1,&mut keys1));
