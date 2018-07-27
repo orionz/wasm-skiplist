@@ -491,8 +491,13 @@ cfg_if! {
         }
 
         #[wasm_bindgen]
-        pub fn bench(size: usize) {
-          bench_local(size);
+        pub fn bench_tree(size: usize) {
+          bench_tree_impl(size);
+        }
+
+        #[wasm_bindgen]
+        pub fn bench_vector(size: usize) {
+          bench_vec_impl(size);
         }
 
     } else {
@@ -592,21 +597,19 @@ fn remove(size: usize, s: &mut Box<ListMap<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
 }
 
 
-pub fn bench_local(size: usize) {
-//  let mut keys1 = vec![];
-  let mut _s1 : Box<ListMap<Uuid,Uuid>> = Box::new(IndexedVector::new());
+pub fn bench_vec_impl(size: usize) {
+  let mut keys1 = vec![];
+  let mut s1 : Box<ListMap<Uuid,Uuid>> = Box::new(IndexedVector::new());
 
-/*
   measure("fill-native-vec",|| fill(size, &mut s1,&mut keys1));
   measure("indexof-native-vec",|| indexof(size, &mut s1,&mut keys1));
   measure("keyOf-native-vec",|| keyof(size, &mut s1,&mut keys1));
   measure("getValue-native-vec",|| getvalue(size, &mut s1,&mut keys1));
   measure("setValue-native-vec",|| setvalue(size, &mut s1,&mut keys1));
   measure("remove-native-vec",|| remove(size, &mut s1,&mut keys1));
- // s1.debug();
+}
 
-  log("------");
-*/
+pub fn bench_tree_impl(size: usize) {
 
 //  for i in vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ] {
 //    unsafe { NODE_SIZE = i; }
@@ -619,7 +622,6 @@ pub fn bench_local(size: usize) {
     measure("getValue-native-tree",|| getvalue(size, &mut s2,&mut keys2));
     measure("setValue-native-tree",|| setvalue(size, &mut s2,&mut keys2));
     measure("remove-native-tree",|| remove(size, &mut s2,&mut keys2));
-//    s2.debug();
 //  }
 }
 
@@ -627,6 +629,6 @@ pub fn bench_local(size: usize) {
 mod tests {
     #[test]
     fn bench_test() {
-      ::bench_local(10000);
+      ::bench_tree_impl(10000);
     }
 }

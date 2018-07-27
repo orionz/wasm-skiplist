@@ -93,7 +93,9 @@ skip_async.then((skip) => {
   s2 = bench("setValue-rust", () => setValue(s2))
   s2 = bench("removeIndex-rust", () => removeIndex(s2))
   console.log("------ [ wasm - tree ] ---------")
-  skip.bench(SIZE)
+  skip.bench_tree(SIZE)
+  //console.log("------ [ wasm - vec ] ---------")
+  //skip.bench_vector(SIZE)
   console.log("------ [ binary - tree ] -------")
   require('child_process').exec("Cargo test -- --nocapture",(err,stdout,stderr) => {
     console.log(stdout)
