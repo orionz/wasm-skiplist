@@ -622,6 +622,7 @@ fn remove(size: usize, s: &mut Box<ListMap<Uuid,Uuid>>, keys: &mut Vec<Uuid>) {
 
 
 pub fn bench_local(size: usize) {
+/*
   let mut keys1 = vec![];
   let mut s1 : Box<ListMap<Uuid,Uuid>> = Box::new(IndexedVector::new());
 
@@ -634,6 +635,7 @@ pub fn bench_local(size: usize) {
  // s1.debug();
 
   log("------");
+*/
 
 //  for i in vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ] {
 //    unsafe { NODE_SIZE = i; }

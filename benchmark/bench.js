@@ -78,20 +78,25 @@ function fill(SkipList) {
 
 skip_async.then((skip) => {
 
+  console.log("------[ js - skiplist ] ------")
   let s1 = bench("fill-ref", () => fill(skip_ref.SkipList))
   bench("indexOf-ref", () => indexOf(s1))
   bench("keyOf-ref", () => keyOf(s1))
   bench("getValue-ref", () => getValue(s1))
   s1 = bench("setValue-ref", () => setValue(s1))
   s1 = bench("removeIndex-ref", () => removeIndex(s1))
-  console.log("------")
+  console.log("------[ js -> wasm - tree ] ------")
   let s2 = bench("fill-rust", () => fill(skip.SkipList))
   bench("indexOf-rust", () => indexOf(s2))
   bench("keyOf-rust", () => keyOf(s2))
   bench("getValue-rust", () => getValue(s2))
   s2 = bench("setValue-rust", () => setValue(s2))
   s2 = bench("removeIndex-rust", () => removeIndex(s2))
-  console.log("------")
+  console.log("------ [ wasm - tree ] ---------")
   skip.bench(SIZE)
+  console.log("------ [ binary - tree ] -------")
+  require('child_process').exec("Cargo test -- --nocapture",(err,stdout,stderr) => {
+    console.log(stdout)
+  })
 })
 
