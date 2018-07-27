@@ -19,7 +19,7 @@ extern {
 pub struct SkipList {
     #[wasm_bindgen(readonly)]
     pub length: usize,
-    list: Box<ListMap<String,String>>,
+    list: Box<ListMap<String,JsValue>>,
 }
 
 #[wasm_bindgen]
@@ -40,7 +40,7 @@ impl SkipList {
   }
 
   #[wasm_bindgen(js_name = _insertAfter)]
-  pub fn insert_after(&mut self, after: Option<String>, key: String, val: String) {
+  pub fn insert_after(&mut self, after: Option<String>, key: String, val: JsValue) {
     match after {
       Some(s) => self.list.insert_after(&s,key,val),
       None => self.list.insert(0,key,val)
@@ -56,14 +56,14 @@ impl SkipList {
     };
   }
 
-  #[wasm_bindgen(js_name = _keyOf)]
-  pub fn key_of(&self, index: isize) -> Option<String> {
-    self.list.get_key(self.clean_index(index)).map(|k| k.clone())
+  #[wasm_bindgen(js_name = keyOf)]
+  pub fn key_of(&self, index: isize) -> JsValue {
+    self.list.get_key(self.clean_index(index)).map(|k| JsValue::from_str(k)).unwrap_or(JsValue::null())
   }
 
-  #[wasm_bindgen(js_name = _valueOf)]
-  pub fn value_of(&self, index: isize) -> Option<String> {
-    self.list.get_value(self.clean_index(index)).and_then(|v| Some(v.clone()))
+  #[wasm_bindgen(js_name = valueOf)]
+  pub fn value_of(&self, index: isize) -> JsValue {
+    self.list.get_value(self.clean_index(index)).cloned().unwrap_or(JsValue::null())
   }
 
   fn clean_index(&self, index: isize) -> usize {
@@ -79,19 +79,19 @@ impl SkipList {
   }
 
   #[wasm_bindgen(js_name = getValue)]
-  pub fn get_value(&self, key: String) -> Option<String> {
-    self.list.get(&key).map(|k| k.clone())
+  pub fn get_value(&self, key: String) -> JsValue {
+    self.list.get(&key).cloned().unwrap_or(JsValue::undefined())
   }
 
   #[wasm_bindgen(js_name = _setValue)]
-  pub fn set_value(&mut self, key: String, value: String) {
+  pub fn set_value(&mut self, key: String, value: JsValue) {
     if ! self.list.set(&key,value) {
       throw("referenced key does not exist");
     };
   }
 
   #[wasm_bindgen(js_name = _insertIndex)]
-  pub fn insert_index(&mut self, index: usize, key: String, value: String) {
+  pub fn insert_index(&mut self, index: usize, key: String, value: JsValue) {
     self.list.insert(index,key,value);
     self.length += 1;
   }

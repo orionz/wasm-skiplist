@@ -26,13 +26,6 @@ let iterator = function(mode) {
 
 module.exports = new Promise(function(resolve, reject) {
   sk1.then((sk) => {
-    sk.SkipList.prototype.keyOf = function(k) {
-      return this._keyOf(k) || null
-    };
-    sk.SkipList.prototype.valueOf = function(k) {
-      return this._valueOf(k) || null
-    };
-    // removeKey
 
     sk.SkipList.prototype.removeKey = function(k) {
       this._removeKey(k);
@@ -68,8 +61,10 @@ module.exports = new Promise(function(resolve, reject) {
       this.ptr = 0;
       return n;
     };
+
     sk.SkipList.prototype.iterator = iterator;
     sk.SkipList.prototype[Symbol.iterator] = function() { return this.iterator('values') }
+
     resolve(sk)
   }).catch((e) => reject(e))
 })
