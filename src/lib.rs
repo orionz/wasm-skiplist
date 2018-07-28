@@ -17,10 +17,10 @@ extern crate time;
 extern crate rand;
 
 pub mod tree;
-use tree::{TreeMap};
+pub use tree::{TreeMap};
 
 pub mod vec;
-use vec::{IndexedVector};
+pub use vec::{IndexedVector};
 
 pub mod listmap;
 use listmap::{ListMap};
@@ -36,14 +36,15 @@ cfg_if! {
 }
 
 pub mod bench;
-use bench::{bench_tree_impl};
+pub use bench::{bench_tree_impl};
 cfg_if! {
   if #[cfg(feature = "wasm")] {
-    use bench::{bench_vec_impl};
+    pub use bench::{bench_vec_impl};
   }
 }
 
 pub mod skip;
+pub use skip::{SkipList};
 
 #[cfg(test)]
 mod tests {
