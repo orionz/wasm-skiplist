@@ -31,7 +31,7 @@ class Node {
   }
 
   setValue (key, value) {
-    return new Node(this.key, value, this.level, this.prevKey, this.nextKey,
+   return new Node(this.key, value, this.level, this.prevKey, this.nextKey,
                     this.prevCount, this.nextCount)
   }
 

@@ -1,0 +1,19 @@
+[package]
+name = "neon-skip"
+version = "0.1.0"
+authors = ["Orion Henry <orion.henry@gmail.com>"]
+license = "MIT"
+build = "build.rs"
+exclude = ["artifacts.json", "index.node"]
+
+[lib]
+name = "neon_skip"
+crate-type = ["dylib"]
+
+[build-dependencies]
+neon-build = "0.2.0"
+#skip_list = { path = "../.." }
+
+[dependencies]
+neon = "0.2.0"
+skip_list = { path = "../.." }

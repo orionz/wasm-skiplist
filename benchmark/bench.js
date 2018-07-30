@@ -1,12 +1,16 @@
 
 var microtime = require("microtime");
 
+var memwatch = require('node-memwatch');
+memwatch.on('leak', function(info) { console.log(info) });
+
 const uuidv4 = require('uuid/v4');
 
 const SIZE = 10000;
 
 let skip_ref = require("./skip_list_ref");
 let skip_async = require("../dist/index");
+let skip_neon = require("../neon/lib/index");
 
 function pick(items) {
   return items[index(items)];
@@ -96,6 +100,14 @@ skip_async.then((skip) => {
   skip.bench_tree(SIZE)
   //console.log("------ [ wasm - vec ] ---------")
   //skip.bench_vector(SIZE)
+  console.log("------[ js -> neon - tree ] ------")
+  let s3 = bench("fill-neon", () => fill(skip.SkipList))
+  bench("indexOf-neon", () => indexOf(s3))
+  bench("keyOf-neon", () => keyOf(s3))
+  bench("getValue-neon", () => getValue(s3))
+  s3 = bench("setValue-neon", () => setValue(s3))
+  s3 = bench("removeIndex-neon", () => removeIndex(s3))
+
   console.log("------ [ binary - tree ] -------")
   require('child_process').exec("Cargo test -q -- --nocapture",(err,stdout,stderr) => {
     console.log(stdout)

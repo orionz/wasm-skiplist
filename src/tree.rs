@@ -73,6 +73,10 @@ impl<K: Debug + Eq + PartialEq + Clone + Hash, V: Clone> ListMap<K,V> for TreeMa
     log("ROOT");
     self.node.debug();
   }
+
+  fn len(&self) -> usize {
+    self.node.len()
+  }
 }
 
 impl<K: Debug + Eq + PartialEq + Clone + Hash,V: Clone> Node<K,V> {
@@ -132,6 +136,13 @@ impl<K: Debug + Eq + PartialEq + Clone + Hash, V: Clone> ListMap<K,V> for Node<K
     match self {
       Node::Leaf(l) => l.set(key,val),
       Node::Branch(b) => b.set(key,val),
+    }
+  }
+
+  fn len(&self) -> usize {
+    match self {
+      Node::Leaf(l) => l.len(),
+      Node::Branch(b) => b.len(),
     }
   }
 }
@@ -252,6 +263,10 @@ impl<K: Debug + Clone + Eq + Hash + PartialEq,V: Clone> ListMap<K,V> for Branch<
       false
     }
   }
+
+  fn len(&self) -> usize {
+    self.left_keys.len() + self.right_keys.len()
+  }
 }
     
 
@@ -284,6 +299,10 @@ impl<K: Debug + Clone + Eq + Hash + PartialEq,V: Clone> ListMap<K,V> for Leaf<K,
 
   fn get_value(&self, index: usize) -> Option<&V> {
     self.vals.get(index)
+  }
+
+  fn len(&self) -> usize {
+    self.keys.len()
   }
 
   fn set(&mut self, key: &K, val: V) -> bool {

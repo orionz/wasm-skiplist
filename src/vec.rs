@@ -59,5 +59,9 @@ impl<K: Debug + Eq + Hash + PartialEq + Clone,V: Clone> ListMap<K,V> for Indexed
       None => false
     }
   }
+
+  fn len(&self) -> usize {
+    self.v.len()
+  }
 }
 

@@ -1,4 +1,5 @@
 /target
+/neon/native/target
 **/*.rs.bk
 Cargo.lock
 node_modules

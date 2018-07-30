@@ -1,0 +1,19 @@
+{
+  "name": "neon-skip",
+  "version": "0.1.0",
+  "description": "",
+  "main": "lib/index.js",
+  "author": "Orion Henry <orion.henry@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "neon-cli": "^0.2.0",
+    "node-memwatch": "^1.0.1"
+  },
+  "scripts": {
+    "install": "neon build"
+  },
+  "devDependencies": {
+    "jsverify": "^0.8.3",
+    "mocha": "^5.2.0"
+  }
+}

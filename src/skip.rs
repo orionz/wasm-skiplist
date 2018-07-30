@@ -43,5 +43,9 @@ impl<K: Debug + Eq + PartialEq + Clone + Hash, V: Clone> ListMap<K,V> for SkipLi
 
   fn debug(&self) {
   }
+
+  fn len(&self) -> usize {
+    0
+  }
 }
 

@@ -23,7 +23,7 @@ pub mod vec;
 pub use vec::{IndexedVector};
 
 pub mod listmap;
-use listmap::{ListMap};
+pub use listmap::{ListMap};
 
 cfg_if! {
     if #[cfg(feature = "wasm")] {
